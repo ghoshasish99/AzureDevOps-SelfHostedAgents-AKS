@@ -47,6 +47,8 @@ stages:
                    sed -i 's,AZP_POOL_NAME,$(PoolName),g' ReplicationController.yml
                    sed -i 's,AZP_URL_VALUE,$(OrganizationURL),g' ReplicationController.yml
                    sed -i 's,AZP_TOKEN_SECRET,$(Pat),g' ReplicationController.yml
+                   sed -i 's,ACR_NAME,$(acrRegistry),g' ReplicationController.yml
+                   sed -i 's,REPOSITORY_NAME,$(acrRepository),g' ReplicationController.yml
           - task: CmdLine@2
             displayName: 'Deploy'
             inputs:
