@@ -37,7 +37,7 @@ stages:
           - task: Kubernetes@1
             inputs:
               connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: 'AKS'
+              kubernetesServiceEndpoint: '$(AKSserviceConnectionName)'
               command: 'login'  
             
           - task: CmdLine@2
