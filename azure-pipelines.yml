@@ -8,7 +8,7 @@ resources:
 
 stages:
 - stage: Build
-  displayName: Build stage
+  displayName: Build Agent Images
   jobs:  
   - job: Build
     displayName: Build
@@ -24,7 +24,7 @@ stages:
               docker tag agents $(acrRegistry)/$(acrRepository)
               docker push $(acrRegistry)/$(acrRepository)
 - stage: DeployDockerBuidAgentStage
-  displayName: Deploy Docker Buid Agents Stage
+  displayName: Deploy Agents on AKS cluster
   dependsOn: Build
   condition: succeeded()
   jobs:
@@ -53,6 +53,5 @@ stages:
             displayName: 'Deploy'
             inputs:
                 script: |
-                  kubectl create secret docker-registry acr-secret --docker-server=$(acrRegistry) --docker-username=$(acrusername) --docker-password=$(azureACRToken)
                   kubectl apply -f ReplicationController.yml      
               
