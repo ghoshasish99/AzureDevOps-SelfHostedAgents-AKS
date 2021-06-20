@@ -53,5 +53,6 @@ stages:
             displayName: 'Deploy'
             inputs:
                 script: |
+                  kubectl create secret docker-registry acr-secret --docker-server=$(acrRegistry) --docker-username=$(acrusername) --docker-password=$(azureACRToken)
                   kubectl apply -f ReplicationController.yml      
               

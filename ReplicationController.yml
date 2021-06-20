@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: selfhosted-agents
-          image: selfhostedagentregistry.azurecr.io/selfhosted-agents:latest
+          image: ACR_NAME/REPOSITORY_NAME:latest
           ports:
           - containerPort: 80
           resources:
