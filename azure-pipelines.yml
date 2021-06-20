@@ -1,0 +1,55 @@
+trigger:
+  branches:
+    include:
+    - master
+
+resources:
+  - repo: self
+
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:  
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+       - task: CmdLine@2
+         displayName: 'Build and Push Image'
+         inputs:
+            script: |
+              docker build -t agents:latest .
+              docker login $(acrRegistry) --username $(acrusername) --password $(azureACRToken)
+              docker tag agents $(acrRegistry)/$(acrRepository)
+              docker push $(acrRegistry)/$(acrRepository)
+- stage: DeployDockerBuidAgentStage
+  displayName: Deploy Docker Buid Agents Stage
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - job: DeployDockerBuidAgentJob
+    condition: succeeded()
+    displayName: Deploy Docker Buid Agents Job
+    pool:
+      vmImage:  ubuntu-latest
+    steps:
+          - task: Kubernetes@1
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: 'AKS'
+              command: 'login'  
+            
+          - task: CmdLine@2
+            displayName: 'Replace Tokens'
+            inputs:
+                script: |
+                   sed -i 's,AZP_POOL_NAME,$(PoolName),g' ReplicationController.yml
+                   sed -i 's,AZP_URL_VALUE,$(OrganizationURL),g' ReplicationController.yml
+                   sed -i 's,AZP_TOKEN_SECRET,$(Pat),g' ReplicationController.yml
+          - task: CmdLine@2
+            displayName: 'Deploy'
+            inputs:
+                script: |
+                  kubectl apply -f ReplicationController.yml      
+              

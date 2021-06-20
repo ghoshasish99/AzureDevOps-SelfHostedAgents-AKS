@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azdevops-deployment 
+spec:
+  replicas: 3
+  progressDeadlineSeconds: 1800
+  selector:
+    matchLabels:
+      app: azdevops-agent
+  template:
+    metadata:
+      labels:
+        app: azdevops-agent
+    spec:
+      containers:
+        - name: selfhosted-agents
+          image: selfhostedagentregistry1.azurecr.io/selfhosted-agents:latest
+          ports:
+          - containerPort: 80
+          resources:
+            requests:
+              cpu: "130m"
+              memory: "300Mi"
+            limits:
+              cpu: "130m"
+              memory: "300Mi"
+          env:
+            - name: AZP_POOL
+              value: AZP_POOL_NAME
+            - name: AZP_TOKEN
+              value: AZP_TOKEN_SECRET
+            - name: AZP_URL
+              value: AZP_URL_VALUE    
+          volumeMounts:
+          - name: docker-graph-storage
+            mountPath: /var/run/docker.sock
+      imagePullSecrets:
+        - name: acr-secret    
+      volumes:
+      - name: docker-graph-storage
+        hostPath:
+            path: /var/run/docker.sock
